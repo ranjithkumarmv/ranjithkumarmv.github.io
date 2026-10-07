@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ranjith Kumar MV – CV</title>
+<meta name="description" content="CV of Ranjith Kumar MV – Associate Architect at Paysafe, Hyderabad. 12+ years in platform engineering, cloud and data engineering." />
+<link rel="canonical" href="https://ranjithkumarmv.com/cv.html" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&amp;display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1d1d1f; --soft: #515154; --faint: #86868b; --line: #e3e3e8; --accent: #0066cc;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
+    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { background: #f5f5f7; }
+  body { margin: 0; color: var(--ink); font: 400 9.5pt/1.45 var(--font); letter-spacing: -.005em; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; }
+  h1, h2, h3, h4 { font-family: var(--font-display); margin: 0; letter-spacing: -.02em; }
+  p { margin: 0; }
+
+  .toolbar { max-width: 210mm; margin: 24px auto 0; display: flex; justify-content: space-between; align-items: center; padding: 0 4px; font-size: 14px; }
+  .toolbar a { font-weight: 500; }
+  .page { background: #fff; width: 210mm; min-height: 297mm; margin: 16px auto 40px; padding: 12mm 16mm 9mm; box-shadow: 0 2px 6px rgba(0,0,0,.04), 0 12px 32px rgba(0,0,0,.08); }
+
+  header { padding-bottom: 12px; border-bottom: 1.5px solid var(--ink); }
+  header h1 { font-size: 26pt; font-weight: 700; letter-spacing: -.035em; line-height: 1; }
+  .title { font: 500 12.5pt var(--font-display); color: var(--soft); margin-top: 6px; letter-spacing: -.015em; }
+  .contact { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 2px 0; font-size: 8.8pt; color: var(--soft); }
+  .contact li + li::before { content: "·"; margin: 0 6px; color: var(--faint); }
+  .contact a { color: var(--soft); }
+
+  section { display: grid; grid-template-columns: 30mm 1fr; gap: 0 7mm; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  section:last-child { border-bottom: 0; }
+  section > h2 { font: 600 8pt var(--font); text-transform: uppercase; letter-spacing: .09em; color: var(--accent); padding-top: 2.5pt; }
+  .summary { font-size: 10pt; line-height: 1.5; }
+
+  .job + .job { margin-top: 7px; }
+  .job-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .job-head h3 { font-size: 11.5pt; font-weight: 600; }
+  .job-head .when { font-size: 9pt; color: var(--faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .where { font-size: 9pt; color: var(--faint); margin-top: 1px; }
+  .ladder { list-style: none; margin: 8px 0 0; padding: 0 0 0 14px; border-left: 1.5px solid var(--line); }
+  .ladder > li { position: relative; padding: 0 0 6px; }
+  .ladder > li:last-child { padding-bottom: 0; }
+  .ladder > li::before { content: ""; position: absolute; left: -18.5px; top: 4.5pt; width: 6.5px; height: 6.5px; border-radius: 50%; background: #fff; border: 1.5px solid var(--faint); }
+  .ladder > li.current::before { background: var(--accent); border-color: var(--accent); }
+  .role { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .role h4 { font-size: 10.5pt; font-weight: 600; }
+  .role span { font-size: 9pt; color: var(--faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  ul.points { margin: 4px 0 0; padding-left: 13px; color: var(--soft); }
+  ul.points li { margin-bottom: 1px; }
+  ul.points li::marker { color: var(--faint); }
+  .desc { color: var(--soft); margin-top: 3px; }
+
+  .skills { display: grid; grid-template-columns: 30mm 1fr; gap: 2px 12px; margin: 0; }
+  .skills dt { font-weight: 600; }
+  .skills dd { margin: 0; color: var(--soft); }
+
+  @page { size: A4; margin: 0; }
+  @media print {
+    html { background: #fff; }
+    .toolbar { display: none; }
+    .page { margin: 0; box-shadow: none; width: auto; min-height: 0; }
+    .job, .ladder > li, section { break-inside: avoid; }
+  }
+  @media screen and (max-width: 820px) {
+    .page { width: auto; min-height: 0; margin: 12px; padding: 24px 20px; }
+    .toolbar { margin: 16px 16px 0; }
+    .contact { flex-direction: column; }
+    .contact li + li::before { display: none; }
+    section { grid-template-columns: 1fr; gap: 8px; }
+    .skills { grid-template-columns: 1fr; gap: 0; }
+    .skills dd { margin-bottom: 8px; }
+    .job-head, .role { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<nav class="toolbar"><a href="/">← ranjithkumarmv.com</a><a href="docs/RanjithKumarMV.pdf" download>Download PDF</a></nav>
+
+<main class="page">
+  <header>
+    <div>
+      <h1>Ranjith Kumar MV</h1>
+      <p class="title">Associate Architect · Platform &amp; Data Engineering · Hyderabad, India</p>
+    </div>
+    <ul class="contact">
+      <li><a href="mailto:ranjithkmrmv@gmail.com">ranjithkmrmv@gmail.com</a></li>
+      <li><a href="tel:+919445727005">+91 94457 27005</a></li>
+      <li><a href="https://ranjithkumarmv.com">ranjithkumarmv.com</a></li>
+      <li><a href="https://www.linkedin.com/in/ranjithkumarmv">linkedin.com/in/ranjithkumarmv</a></li>
+    </ul>
+  </header>
+
+  <section>
+    <h2>Summary</h2>
+    <p class="summary">Associate Architect with 12+ years in software engineering, including 9+ years at Paysafe progressing from R&amp;D Engineer to platform engineering lead and architect. Experienced in cloud platforms, microservices and data engineering in the payments industry, with a background in rapidly prototyping emerging technology such as blockchain and NLP.</p>
+  </section>
+
+  <section>
+    <h2>Experience</h2>
+    <div>
+      <div class="job">
+        <div class="job-head"><h3>Paysafe</h3><span class="when">Jul 2017 — Present · 9 yrs 4 mos</span></div>
+        <p class="where">Hyderabad, India · Full-time</p>
+        <ol class="ladder">
+          <li class="current">
+            <div class="role"><h4>Associate Architect</h4><span>Apr 2023 — Present</span></div>
+          </li>
+          <li>
+            <div class="role"><h4>Lead Platform Engineer</h4><span>Oct 2021 — Present</span></div>
+          </li>
+          <li>
+            <div class="role"><h4>Senior Platform Engineer</h4><span>May 2020 — Oct 2021</span></div>
+          </li>
+          <li>
+            <div class="role"><h4>R&amp;D Engineer</h4><span>Jul 2017 — May 2020</span></div>
+            <ul class="points">
+              <li>Prototyped a remittance chatbot using NLP (Recast.AI) for intent classification, integrated with Facebook Messenger.</li>
+              <li>Delivered a proof of concept for infrastructure as code using AWS CloudFormation.</li>
+              <li>Evaluated blockchains including Hyperledger Fabric, Chain and Ethereum; built a cryptocurrency wallet on Stellar.</li>
+              <li>Worked on merchant linkage analysis using KeyLines and Dgraph graph analytics.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+
+      <div class="job">
+        <div class="job-head"><h3>UMAI · Software Engineer</h3><span class="when">May 2017 — Jun 2017</span></div>
+        <p class="desc">SaaS platform for restaurant reservations. Built embeddable widgets for integration with third-party websites.</p>
+      </div>
+      <div class="job">
+        <div class="job-head"><h3>A Slice Of Digital · Software Engineer</h3><span class="when">Jan 2017 — Apr 2017</span></div>
+        <p class="desc">Migrated the company website from shared hosting to a VPS with zero downtime; load-tested sites with Locust and optimised performance; built a Candy Crush–style game in JavaScript.</p>
+      </div>
+      <div class="job">
+        <div class="job-head"><h3>Fromahome Technology · Software Developer</h3><span class="when">May 2015 — Dec 2016</span></div>
+        <p class="desc">Marketplace connecting home cooks with customers. Developed the backend and REST endpoints for web and mobile apps.</p>
+      </div>
+      <div class="job">
+        <div class="job-head"><h3>Adsonik Media · Full Stack Developer</h3><span class="when">Nov 2014 — May 2015</span></div>
+        <p class="desc">Portal for renting billboards directly from owners. Built the prototype website in PHP and MySQL.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Skills</h2>
+    <dl class="skills">
+      <dt>Architecture</dt><dd>System design, microservices, distributed systems, REST APIs</dd>
+      <dt>Platform &amp; cloud</dt><dd>AWS, CloudFormation, infrastructure as code, Kubernetes, Docker, Git</dd>
+      <dt>Data</dt><dd>Data engineering, ETL pipelines, ELK Stack, Dgraph, analytics</dd>
+      <dt>Languages</dt><dd>Go, Node.js, JavaScript, HTML, Angular</dd>
+      <dt>Emerging tech</dt><dd>Blockchain (Stellar, Hyperledger Fabric, Ethereum), NLP chatbots</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Education</h2>
+    <div class="job">
+      <div class="job-head"><h3>Madras Institute of Technology, Anna University</h3><span class="when">Aug 2011 — May 2015</span></div>
+      <p class="desc">Bachelor of Engineering — Electronics and Communication</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Interests</h2>
+    <p>Stock market analytics and algorithmic trading, AI, blockchain, travel.</p>
+  </section>
+</main>
+</body>
+</html>
