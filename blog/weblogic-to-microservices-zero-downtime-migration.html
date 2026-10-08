@@ -49,6 +49,7 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
+<div class="progress" id="progress" aria-hidden="true"></div>
 
 <header class="nav" id="top">
   <div class="wrap">
@@ -67,15 +68,18 @@
 <main id="main">
   <article class="post-wrap">
     <header class="article-head">
-      <a class="crumb" href="/blog/">← Blog</a>
+      <div class="hero-bg" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="grid"></span></div>
+      <a class="crumb" href="/blog/"><i class="fa fa-arrow-left" aria-hidden="true"></i> All posts</a>
       <h1>Migrating a 17-year-old WebLogic system to microservices with zero downtime</h1>
       <p class="dek">How we moved Customer Vault and Bank Core off a legacy WebLogic platform — by shadowing live traffic with Envoy, proving parity with OpenDiffy, and shifting users over a percentage at a time.</p>
       <div class="byline">
         <span class="brand-mark" aria-hidden="true">RK</span>
-        <div><b>Ranjith Kumar MV</b><time datetime="2026-10-08">8 October 2026</time> · <span id="read-time">8 min read</span></div>
+        <div><b>Ranjith Kumar MV</b><time datetime="2021-10">2021 – 2023</time> · Lead Platform Engineer · <span id="read-time">8 min read</span></div>
       </div>
       <ul class="tags inline"><li>Migration</li><li>Envoy</li><li>OpenDiffy</li><li>Microservices</li><li>Platform engineering</li></ul>
     </header>
+
+    <nav class="toc" id="toc" aria-label="On this page"><p>On this page</p><ol id="toc-list"></ol></nav>
 
     <div class="prose">
       <section class="tldr" aria-label="Summary">
@@ -159,7 +163,7 @@
 
       <h2>Phase 1 — Shadow traffic with Envoy</h2>
       <p>Envoy's <code>request_mirror_policies</code> send a copy of each request to a second cluster in a fire-and-forget fashion: the client gets the response from the primary route, and the shadow response is discarded. That let the new services see the full shape of production traffic — real payloads, real volumes, real edge cases — while carrying zero customer risk.</p>
-<pre><code><span class="c"># Envoy route: serve from WebLogic, mirror every request for comparison</span>
+<pre data-lang="Envoy · YAML"><code><span class="c"># Envoy route: serve from WebLogic, mirror every request for comparison</span>
 <span class="k">routes</span>:
 - <span class="k">match</span>: { <span class="k">prefix</span>: <span class="v">"/"</span> }
   <span class="k">route</span>:
@@ -184,7 +188,7 @@
         <li><strong>Candidate</strong> — the new microservice.</li>
       </ul>
       <p>The secondary is the clever part. Comparing primary with secondary shows which fields differ <em>even between two copies of the same code</em> — timestamps, generated IDs, ordering of unordered collections. Diffy treats those fields as noise and filters them out of the primary-vs-candidate comparison. What's left are real behavioural differences.</p>
-<pre><code><span class="c"># Illustrative OpenDiffy setup</span>
+<pre data-lang="Shell"><code><span class="c"># Illustrative OpenDiffy setup</span>
 docker run -d --name diffy -p 8880:8880 -p 8888:8888 diffy/diffy \
   -candidate=<span class="v">vault-service:8080</span> \
   -master.primary=<span class="v">weblogic-a:7001</span> \
@@ -202,7 +206,7 @@ docker run -d --name diffy -p 8880:8880 -p 8888:8888 diffy/diffy \
 
       <h2>Phase 3 — Percentage-based migration</h2>
       <p>Once an endpoint showed parity, we started sending it real traffic using Envoy's <code>weighted_clusters</code>. The weight is just configuration, so moving forward — or rolling back — needed no deployment of either application.</p>
-<pre><code><span class="c"># Envoy route: 95% legacy, 5% new — keep mirroring for continued comparison</span>
+<pre data-lang="Envoy · YAML"><code><span class="c"># Envoy route: 95% legacy, 5% new — keep mirroring for continued comparison</span>
 <span class="k">route</span>:
   <span class="k">weighted_clusters</span>:
     <span class="k">clusters</span>:
@@ -251,6 +255,14 @@ docker run -d --name diffy -p 8880:8880 -p 8888:8888 diffy/diffy \
         <p>Associate Architect at Paysafe, working on platform engineering, cloud infrastructure and data engineering. <a href="/">More about me</a> · <a href="https://www.linkedin.com/in/ranjithkumarmv" target="_blank" rel="noopener">LinkedIn</a></p>
       </div>
     </aside>
+    <a class="next-post" href="/blog/antminer-s9-home-bitcoin-mining-2016.html">
+      <span class="cover cover-btc" aria-hidden="true"><i class="fa fa-bitcoin"></i></span>
+      <span class="next-body">
+        <span class="meta">Keep reading · Hobby project · Sep 2016 – Dec 2017</span>
+        <b>The bitcoin miner I imported in 2016 — and the mining farm that never happened</b>
+      </span>
+      <i class="fa fa-arrow-right next-arrow" aria-hidden="true"></i>
+    </a>
   </article>
 </main>
 
@@ -265,13 +277,7 @@ docker run -d --name diffy -p 8880:8880 -p 8888:8888 diffy/diffy \
   </div>
 </footer>
 
+<script src="/js/post.js" defer></script>
 <script src="/js/site.js" defer></script>
-<script>
-  // reading time from the article body
-  (function () {
-    var words = document.querySelector(".prose").innerText.trim().split(/\s+/).length;
-    document.getElementById("read-time").textContent = Math.max(1, Math.round(words / 230)) + " min read";
-  })();
-</script>
 </body>
 </html>

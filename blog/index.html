@@ -29,6 +29,7 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
+<div class="progress" id="progress" aria-hidden="true"></div>
 
 <header class="nav" id="top">
   <div class="wrap">
@@ -44,20 +45,50 @@
   </div>
 </header>
 
-<main id="main" class="post-wrap">
+<main id="main">
   <header class="blog-head">
-    <h1>Blog</h1>
-    <p>Notes on platform architecture, legacy migrations, data engineering and markets.</p>
+    <div class="hero-bg" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="grid"></span></div>
+    <div class="wrap">
+      <span class="sec-num">Writing</span>
+      <h1>Blog</h1>
+      <p>Notes on platform architecture, legacy migrations, data engineering and markets — from production systems and side projects.</p>
+    </div>
   </header>
-  <ul class="post-list">
-    <li>
-      <a href="/blog/weblogic-to-microservices-zero-downtime-migration.html">
-        <div class="post-meta"><time datetime="2026-10-08">8 Oct 2026</time><span>Migration · Envoy · OpenDiffy</span></div>
-        <h2>Migrating a 17-year-old WebLogic system to microservices with zero downtime</h2>
-        <p>How Customer Vault and Bank Core moved off legacy WebLogic by shadowing live traffic with Envoy, proving parity with OpenDiffy, and shifting users over a percentage at a time.</p>
-      </a>
-    </li>
-  </ul>
+  <div class="wrap">
+    <ul class="post-grid">
+      <li class="reveal">
+        <a class="post-tile glow" href="/blog/weblogic-to-microservices-zero-downtime-migration.html">
+          <span class="cover cover-migrate" aria-hidden="true">
+            <svg class="cover-art" viewBox="0 0 320 120">
+              <path class="ln" d="M40 60 H120 M120 60 C150 60 150 28 190 28 H280 M120 60 C150 60 150 92 190 92 H280"/>
+              <rect class="nd" x="12" y="46" width="56" height="28" rx="8"/><rect class="nd hl" x="104" y="44" width="36" height="32" rx="9"/>
+              <rect class="nd" x="216" y="14" width="80" height="28" rx="8"/><rect class="nd hl" x="216" y="78" width="80" height="28" rx="8"/>
+              <circle class="dotp" r="4"><animateMotion dur="2.6s" repeatCount="indefinite" path="M40 60 H120 C150 60 150 92 190 92 H280"/></circle>
+              <circle class="dotp dim" r="4"><animateMotion dur="2.6s" begin="1.3s" repeatCount="indefinite" path="M40 60 H120 C150 60 150 28 190 28 H280"/></circle>
+            </svg>
+          </span>
+          <span class="post-meta"><time datetime="2021-10">2021 – 2023</time><span>Lead Platform Engineer</span></span>
+          <h2>Migrating a 17-year-old WebLogic system to microservices with zero downtime</h2>
+          <p>How Customer Vault and Bank Core moved off legacy WebLogic by shadowing live traffic with Envoy, proving parity with OpenDiffy, and shifting users over a percentage at a time.</p>
+          <ul class="tags"><li>Migration</li><li>Envoy</li><li>OpenDiffy</li></ul>
+          <span class="more">Read the post <i class="fa fa-arrow-right" aria-hidden="true"></i></span>
+        </a>
+      </li>
+      <li class="reveal" style="--d:.08s">
+        <a class="post-tile glow" href="/blog/antminer-s9-home-bitcoin-mining-2016.html">
+          <span class="cover cover-btc" aria-hidden="true">
+            <span class="hashes"><span>0000000000000000000a3f…</span><span>00000000000000000004c1…</span><span>000000000000000000017e…</span></span>
+            <i class="fa fa-bitcoin"></i>
+          </span>
+          <span class="post-meta"><time datetime="2016-09">Sep 2016 – Dec 2017</time><span>Hobby project</span></span>
+          <h2>The bitcoin miner I imported in 2016 — and the mining farm that never happened</h2>
+          <p>An Antminer S9 from Bitmain, a farm plan undone by demonetisation, Slush Pool payouts too small to withdraw — and what Bhutan and Nepal's hydropower say about mining today.</p>
+          <ul class="tags"><li>Bitcoin</li><li>Mining</li><li>Energy</li></ul>
+          <span class="more">Read the post <i class="fa fa-arrow-right" aria-hidden="true"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
 </main>
 
 <footer>
