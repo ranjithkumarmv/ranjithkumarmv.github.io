@@ -62,15 +62,17 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
+<div class="progress" id="progress" aria-hidden="true"></div>
 
 <header class="nav" id="top">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="Ranjith Kumar MV – home"><span class="brand-mark">RK</span>Ranjith Kumar MV</a>
+    <a class="brand" href="#top" aria-label="Ranjith Kumar MV – home"><span class="brand-mark">RK</span><span class="brand-name">Ranjith Kumar MV</span></a>
     <ul class="nav-links" id="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#expertise">Expertise</a></li>
       <li><a href="#experience">Experience</a></li>
       <li><a href="#beyond">Beyond work</a></li>
+      <li><a href="/blog/">Blog</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
     <button class="icon-btn theme-btn" id="theme-btn" type="button" aria-label="Toggle dark mode"><i class="fa fa-moon-o" aria-hidden="true"></i></button>
@@ -81,20 +83,21 @@
 <main id="main">
   <!-- hero -->
   <div class="hero">
+    <div class="hero-bg" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="grid"></span></div>
     <div class="wrap">
-      <p class="eyebrow"><span class="dot" aria-hidden="true"></span>Associate Architect at Paysafe · Hyderabad, India</p>
+      <p class="eyebrow"><span class="dot" aria-hidden="true"></span>Associate Architect at Paysafe <span class="sep" aria-hidden="true"></span><span class="loc">Hyderabad, India</span></p>
       <h1>Ranjith Kumar MV</h1>
-      <p class="hero-sub">Architect and platform engineer building cloud infrastructure, distributed systems and data platforms for the payments industry.</p>
+      <p class="hero-sub">Building <span class="grad">cloud platforms, distributed systems and data infrastructure</span> for the payments industry.</p>
       <div class="cta">
-        <a class="btn btn-primary" href="#contact">Get in touch</a>
-        <a class="btn" href="https://www.linkedin.com/in/ranjithkumarmv" target="_blank" rel="noopener"><i class="fa fa-linkedin" aria-hidden="true"></i> LinkedIn</a>
-        <a class="btn btn-ghost" href="docs/RanjithKumarMV.pdf" target="_blank" rel="noopener">Download CV <i class="fa fa-arrow-down" aria-hidden="true"></i></a>
+        <a class="btn btn-primary btn-lg" href="#contact">Get in touch <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+        <a class="btn btn-lg" href="https://www.linkedin.com/in/ranjithkumarmv" target="_blank" rel="noopener"><i class="fa fa-linkedin" aria-hidden="true"></i> LinkedIn</a>
+        <a class="btn btn-ghost btn-lg" href="docs/RanjithKumarMV.pdf" target="_blank" rel="noopener">Download CV <i class="fa fa-arrow-down" aria-hidden="true"></i></a>
       </div>
       <dl class="stats">
-        <div><dt>Years in software</dt><dd>12+</dd></div>
-        <div><dt>Years at Paysafe</dt><dd>9+</dd></div>
-        <div><dt>Roles at Paysafe</dt><dd>4</dd></div>
-        <div><dt>Industries: payments, media, food</dt><dd>3</dd></div>
+        <div><dt>Years in software</dt><dd data-count="12">12<span>+</span></dd></div>
+        <div><dt>Years at Paysafe</dt><dd data-count="9">9<span>+</span></dd></div>
+        <div><dt>Roles at Paysafe</dt><dd data-count="4">4</dd></div>
+        <div><dt>Industries: payments, media, food</dt><dd data-count="3">3</dd></div>
       </dl>
     </div>
   </div>
@@ -105,7 +108,8 @@
       <div class="sec-head reveal"><span class="sec-num">About</span><h2>Engineering platforms that teams can build on.</h2></div>
       <div class="about-grid">
         <div class="about-text reveal">
-          <p>I'm an Associate Architect at Paysafe, where I've spent more than nine years growing from R&amp;D engineer to platform lead to architect. My work spans cloud platforms, microservices and data engineering — designing systems that are reliable, scalable and simple for other engineers to use.</p>
+          <p class="lead">I'm an Associate Architect at Paysafe, where I've spent more than nine years growing from R&amp;D engineer to platform lead to architect.</p>
+          <p>My work spans cloud platforms, microservices and data engineering — designing systems that are reliable, scalable and simple for other engineers to use.</p>
           <p>Before Paysafe I built products at startups across media and food tech. Outside work I analyse stock market data, applying the same data engineering habits to markets.</p>
           <div class="about-actions">
             <a class="btn" href="docs/RanjithKumarMV.vcf"><i class="fa fa-user-plus" aria-hidden="true"></i> Save contact</a>
@@ -113,11 +117,11 @@
           </div>
         </div>
         <dl class="facts reveal">
-          <div><dt>Current role</dt><dd>Associate Architect, Paysafe</dd></div>
-          <div><dt>Location</dt><dd>Hyderabad, India</dd></div>
-          <div><dt>Focus</dt><dd>Platform &amp; data engineering</dd></div>
-          <div><dt>Education</dt><dd>B.E. ECE, MIT, Anna University</dd></div>
-          <div class="wide"><dt>Email</dt><dd><a href="mailto:ranjithkmrmv@gmail.com">ranjithkmrmv@gmail.com</a></dd></div>
+          <div><dt><i class="fa fa-briefcase" aria-hidden="true"></i>Current role</dt><dd>Associate Architect, Paysafe</dd></div>
+          <div><dt><i class="fa fa-map-marker" aria-hidden="true"></i>Location</dt><dd>Hyderabad, India</dd></div>
+          <div><dt><i class="fa fa-crosshairs" aria-hidden="true"></i>Focus</dt><dd>Platform &amp; data engineering</dd></div>
+          <div><dt><i class="fa fa-graduation-cap" aria-hidden="true"></i>Education</dt><dd>B.E. ECE, MIT, Anna University</dd></div>
+          <div><dt><i class="fa fa-envelope-o" aria-hidden="true"></i>Email</dt><dd><a href="mailto:ranjithkmrmv@gmail.com">ranjithkmrmv@gmail.com</a></dd></div>
         </dl>
       </div>
     </div>
@@ -127,41 +131,51 @@
   <section id="expertise" class="alt">
     <div class="wrap">
       <div class="sec-head reveal"><span class="sec-num">Expertise</span><h2>What I work on.</h2></div>
-      <div class="skills-grid">
-        <article class="card reveal">
+      <div class="bento">
+        <article class="card glow b-wide reveal">
           <div class="card-icon"><i class="fa fa-sitemap" aria-hidden="true"></i></div>
           <h3>Architecture</h3>
           <p>Designing distributed systems and service boundaries that scale with the business.</p>
           <ul class="tags"><li>System design</li><li>Microservices</li><li>Distributed systems</li></ul>
+          <svg class="arch-art" viewBox="0 0 260 140" aria-hidden="true">
+            <path class="ln" d="M130 30 V60 M130 60 H50 V96 M130 60 V96 M130 60 H210 V96"/>
+            <rect class="nd hl" x="96" y="10" width="68" height="28" rx="8"/>
+            <rect class="nd" x="20" y="96" width="60" height="28" rx="8"/>
+            <rect class="nd" x="100" y="96" width="60" height="28" rx="8"/>
+            <rect class="nd" x="180" y="96" width="60" height="28" rx="8"/>
+            <circle class="pulse" r="3.5"><animateMotion dur="3.2s" repeatCount="indefinite" path="M130 30 V60 H50 V96"/></circle>
+            <circle class="pulse" r="3.5"><animateMotion dur="3.2s" begin="1.1s" repeatCount="indefinite" path="M130 30 V96"/></circle>
+            <circle class="pulse" r="3.5"><animateMotion dur="3.2s" begin="2.2s" repeatCount="indefinite" path="M130 30 V60 H210 V96"/></circle>
+          </svg>
         </article>
-        <article class="card reveal">
+        <article class="card glow reveal">
           <div class="card-icon"><i class="fa fa-cubes" aria-hidden="true"></i></div>
           <h3>Platform engineering</h3>
           <p>Building the shared infrastructure and tooling product teams ship on.</p>
           <ul class="tags"><li>Kubernetes</li><li>Docker</li><li>Infrastructure as code</li></ul>
         </article>
-        <article class="card reveal">
+        <article class="card glow reveal">
           <div class="card-icon"><i class="fa fa-database" aria-hidden="true"></i></div>
           <h3>Data engineering</h3>
           <p>Pipelines and data platforms that turn raw events into reliable, queryable data.</p>
           <ul class="tags"><li>Data pipelines</li><li>ETL</li><li>ELK Stack</li><li>Analytics</li></ul>
         </article>
-        <article class="card reveal">
+        <article class="card glow reveal">
           <div class="card-icon"><i class="fa fa-cloud" aria-hidden="true"></i></div>
           <h3>Cloud</h3>
           <p>Running production workloads on AWS with repeatable, automated infrastructure.</p>
           <ul class="tags"><li>AWS</li><li>CloudFormation</li><li>Git</li></ul>
         </article>
-        <article class="card reveal">
+        <article class="card glow reveal">
           <div class="card-icon"><i class="fa fa-code" aria-hidden="true"></i></div>
           <h3>Backend &amp; APIs</h3>
           <p>Services and APIs built for correctness and performance.</p>
           <ul class="tags"><li>Node.js</li><li>Go</li><li>REST APIs</li><li>JavaScript</li></ul>
         </article>
-        <article class="card reveal">
+        <article class="card glow b-wide reveal">
           <div class="card-icon"><i class="fa fa-flask" aria-hidden="true"></i></div>
           <h3>R&amp;D</h3>
-          <p>Prototyping with emerging technology to find what's worth building.</p>
+          <p>Prototyping with emerging technology to find what's worth building — from blockchain wallets to NLP chatbots and graph analytics.</p>
           <ul class="tags"><li>Blockchain</li><li>NLP chatbots</li><li>Graph analytics</li></ul>
         </article>
       </div>
@@ -178,10 +192,14 @@
           <div class="company-logo" aria-hidden="true">P</div>
           <div>
             <h3>Paysafe</h3>
-            <p>Full-time · Hyderabad, India · Jul 2017 — Present · 9 yrs 4 mos</p>
+            <p>Full-time · Hyderabad, India</p>
           </div>
+          <div class="tenure"><b>9 yrs 4 mos</b><span>Jul 2017 — Present</span></div>
         </header>
-        <ol class="roles">
+        <div class="ladder" aria-hidden="true">
+          <span style="--w:2.8">R&amp;D Engineer</span><span style="--w:1.4">Senior Platform</span><span style="--w:1.5">Lead Platform</span><span style="--w:3.5" class="on">Associate Architect</span>
+        </div>
+        <ol class="roles" id="roles">
           <li class="role current">
             <div class="role-date">Apr 2023 — Present</div>
             <div>
@@ -193,6 +211,9 @@
             <div class="role-date">Oct 2021 — Present</div>
             <div>
               <h4>Lead Platform Engineer</h4>
+              <ul>
+                <li>Led the zero-downtime migration of Customer Vault and Bank Core from a 17-year-old WebLogic platform to microservices, using Envoy request shadowing, OpenDiffy parity checks and percentage-based traffic shifting. <a href="/blog/weblogic-to-microservices-zero-downtime-migration.html">Read the write-up&nbsp;→</a></li>
+              </ul>
             </div>
           </li>
           <li class="role">
@@ -215,18 +236,26 @@
         </ol>
       </article>
 
-      <h3 class="sub-head reveal">Earlier</h3>
-      <ol class="earlier reveal">
-        <li><div class="role-date">May 2017 — Jun 2017</div><div><h4>Software Engineer · UMAI</h4><p>SaaS for restaurant reservations; built embeddable widgets for third-party websites.</p></div></li>
-        <li><div class="role-date">Jan 2017 — Apr 2017</div><div><h4>Software Engineer · A Slice Of Digital</h4><p>Zero-downtime migration from shared hosting to VPS; load testing with Locust and performance tuning.</p></div></li>
-        <li><div class="role-date">May 2015 — Dec 2016</div><div><h4>Software Developer · Fromahome Technology</h4><p>Backend for a marketplace connecting home cooks with customers.</p></div></li>
-        <li><div class="role-date">Nov 2014 — May 2015</div><div><h4>Full Stack Developer · Adsonik Media</h4><p>Prototype portal for renting billboards online, in PHP and MySQL.</p></div></li>
-      </ol>
-
-      <h3 class="sub-head reveal">Education</h3>
-      <ol class="earlier reveal">
-        <li><div class="role-date">Aug 2011 — May 2015</div><div><h4>Madras Institute of Technology, Anna University</h4><p>Bachelor of Engineering — Electronics and Communication</p></div></li>
-      </ol>
+      <div class="exp-split">
+        <div>
+          <h3 class="sub-head reveal">Earlier</h3>
+          <ol class="earlier reveal">
+            <li><div class="role-date">May 2017 — Jun 2017</div><h4>Software Engineer · UMAI</h4><p>SaaS for restaurant reservations; built embeddable widgets for third-party websites.</p></li>
+            <li><div class="role-date">Jan 2017 — Apr 2017</div><h4>Software Engineer · A Slice Of Digital</h4><p>Zero-downtime migration from shared hosting to VPS; load testing with Locust and performance tuning.</p></li>
+            <li><div class="role-date">May 2015 — Dec 2016</div><h4>Software Developer · Fromahome Technology</h4><p>Backend for a marketplace connecting home cooks with customers.</p></li>
+            <li><div class="role-date">Nov 2014 — May 2015</div><h4>Full Stack Developer · Adsonik Media</h4><p>Prototype portal for renting billboards online, in PHP and MySQL.</p></li>
+          </ol>
+        </div>
+        <div>
+          <h3 class="sub-head reveal">Education</h3>
+          <div class="edu card reveal">
+            <div class="card-icon"><i class="fa fa-graduation-cap" aria-hidden="true"></i></div>
+            <div class="role-date">Aug 2011 — May 2015</div>
+            <h4>Madras Institute of Technology, Anna University</h4>
+            <p>Bachelor of Engineering — Electronics and Communication</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -235,30 +264,31 @@
     <div class="wrap">
       <div class="sec-head reveal"><span class="sec-num">Beyond work</span><h2>Data, markets and new places.</h2></div>
       <div class="beyond-grid">
-        <article class="card feature reveal">
+        <article class="card glow feature reveal">
           <div class="chart" aria-hidden="true">
             <svg viewBox="0 0 320 120" preserveAspectRatio="none">
-              <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".22"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
-              <path d="M0 92 L20 86 L40 90 L60 74 L80 78 L100 62 L120 68 L140 54 L160 60 L180 44 L200 50 L220 36 L240 42 L260 28 L280 34 L300 18 L320 22 L320 120 L0 120 Z" fill="url(#g)"/>
-              <path d="M0 92 L20 86 L40 90 L60 74 L80 78 L100 62 L120 68 L140 54 L160 60 L180 44 L200 50 L220 36 L240 42 L260 28 L280 34 L300 18 L320 22" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"/>
+              <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".28"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+              <path class="area" d="M0 92 L20 86 L40 90 L60 74 L80 78 L100 62 L120 68 L140 54 L160 60 L180 44 L200 50 L220 36 L240 42 L260 28 L280 34 L300 18 L320 22 L320 120 L0 120 Z" fill="url(#g)"/>
+              <path class="line" pathLength="1" d="M0 92 L20 86 L40 90 L60 74 L80 78 L100 62 L120 68 L140 54 L160 60 L180 44 L200 50 L220 36 L240 42 L260 28 L280 34 L300 18 L320 22" fill="none" stroke="currentColor" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
             </svg>
           </div>
           <span class="meta">Hobby</span>
           <h3>Stock market analytics</h3>
           <p>I analyse stock market data in my spare time, bringing data engineering habits to markets: collecting price data, building analyses and looking for patterns in trends.</p>
         </article>
-        <article class="card reveal">
+        <article class="card glow travel reveal">
           <div class="card-icon"><i class="fa fa-plane" aria-hidden="true"></i></div>
           <span class="meta">Hobby</span>
           <h3>Travel</h3>
           <p>Exploring new places, and the new perspectives that come with them.</p>
         </article>
-        <article class="card reveal">
+        <a class="card glow post-card reveal" href="/blog/weblogic-to-microservices-zero-downtime-migration.html">
           <div class="card-icon"><i class="fa fa-pencil" aria-hidden="true"></i></div>
-          <span class="meta">Coming soon</span>
-          <h3>Writing</h3>
-          <p>Notes on platform architecture, data engineering and markets.</p>
-        </article>
+          <span class="meta">Latest post</span>
+          <h3>Migrating a 17-year-old WebLogic system with zero downtime</h3>
+          <p>Envoy shadowing, OpenDiffy parity checks and percentage-based cutover.</p>
+          <span class="more">Read the post <i class="fa fa-arrow-right" aria-hidden="true"></i></span>
+        </a>
       </div>
     </div>
   </section>
@@ -266,9 +296,10 @@
   <!-- contact -->
   <section id="contact">
     <div class="wrap">
-      <div class="sec-head reveal"><span class="sec-num">Contact</span><h2>Let's talk.</h2></div>
-      <div class="contact-grid">
-        <div class="reveal">
+      <div class="contact-panel reveal">
+        <div class="contact-copy">
+          <span class="sec-num">Contact</span>
+          <h2>Let's talk.</h2>
           <p class="contact-intro">Open to conversations about architecture, platform and data engineering, or interesting collaborations.</p>
           <ul class="contact-list">
             <li><i class="fa fa-envelope-o" aria-hidden="true"></i><a href="mailto:ranjithkmrmv@gmail.com">ranjithkmrmv@gmail.com</a></li>
@@ -276,7 +307,7 @@
             <li><i class="fa fa-map-marker" aria-hidden="true"></i>Hyderabad, India</li>
           </ul>
         </div>
-        <form class="card reveal" id="contact-form" novalidate>
+        <form class="contact-form" id="contact-form" novalidate>
           <div class="field-row">
             <div class="field"><label for="f-name">Name</label><input id="f-name" name="Your Name" type="text" autocomplete="name" required /></div>
             <div class="field"><label for="f-email">Email</label><input id="f-email" name="Your Email" type="email" autocomplete="email" required /></div>
@@ -284,7 +315,7 @@
           <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="Phone Number" type="tel" autocomplete="tel" required /></div>
           <div class="field"><label for="f-msg">Message</label><textarea id="f-msg" name="Message" required></textarea></div>
           <div class="form-foot">
-            <button class="btn btn-primary" type="submit" id="f-send">Send message</button>
+            <button class="btn btn-primary btn-lg" type="submit" id="f-send">Send message <i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
             <p class="form-status" id="f-status" role="status" aria-live="polite"></p>
           </div>
         </form>
@@ -295,13 +326,24 @@
 
 <footer>
   <div class="wrap">
-    <p>© <span id="year">2026</span> Ranjith Kumar MV</p>
+    <div class="foot-brand">
+      <a class="brand" href="#top"><span class="brand-mark">RK</span>Ranjith Kumar MV</a>
+      <p>Associate Architect · Platform &amp; data engineering</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="cv.html">CV</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
     <ul class="socials">
       <li><a href="https://www.linkedin.com/in/ranjithkumarmv" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
       <li><a href="https://github.com/ranjithkumarmv" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a></li>
       <li><a href="https://stackoverflow.com/story/ranjithkumarmv" target="_blank" rel="noopener" aria-label="Stack Overflow"><i class="fa fa-stack-overflow" aria-hidden="true"></i></a></li>
       <li><a href="https://twitter.com/ranjithkmrmv" target="_blank" rel="noopener" aria-label="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
     </ul>
+    <p class="copy">© <span id="year">2026</span> Ranjith Kumar MV</p>
   </div>
 </footer>
 

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Migrating a 17-year-old WebLogic system to microservices with zero downtime – Ranjith Kumar MV</title>
+<meta name="description" content="How we moved Customer Vault and Bank Core off a 17-year-old WebLogic platform onto microservices without downtime, using Envoy request shadowing, OpenDiffy parity checks and percentage-based traffic shifting." />
+<meta name="author" content="Ranjith Kumar MV" />
+<link rel="canonical" href="https://ranjithkumarmv.com/blog/weblogic-to-microservices-zero-downtime-migration.html" />
+<meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Ranjith Kumar MV" />
+<meta property="og:url" content="https://ranjithkumarmv.com/blog/weblogic-to-microservices-zero-downtime-migration.html" />
+<meta property="og:title" content="Migrating a 17-year-old WebLogic system to microservices with zero downtime" />
+<meta property="og:description" content="Envoy request shadowing, OpenDiffy parity checks and percentage-based traffic shifting: how Customer Vault and Bank Core moved off WebLogic without downtime." />
+<meta property="og:image" content="https://ranjithkumarmv.com/images/og-card.png" />
+<meta property="article:published_time" content="2026-10-08" />
+<meta property="article:author" content="Ranjith Kumar MV" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:creator" content="@ranjithkmrmv" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Migrating a 17-year-old WebLogic system to microservices with zero downtime",
+  "description": "How Customer Vault and Bank Core moved off a 17-year-old WebLogic platform onto microservices without downtime, using Envoy request shadowing, OpenDiffy parity checks and percentage-based traffic shifting.",
+  "datePublished": "2026-10-08",
+  "dateModified": "2026-10-08",
+  "image": "https://ranjithkumarmv.com/images/og-card.png",
+  "mainEntityOfPage": "https://ranjithkumarmv.com/blog/weblogic-to-microservices-zero-downtime-migration.html",
+  "keywords": ["WebLogic migration", "microservices", "zero downtime", "Envoy", "traffic shadowing", "OpenDiffy", "canary release", "strangler fig"],
+  "author": { "@type": "Person", "name": "Ranjith Kumar MV", "url": "https://ranjithkumarmv.com/" }
+}
+</script>
+
+<script>try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/font-awesome.css" />
+<link rel="stylesheet" href="/css/site.css" />
+<link rel="stylesheet" href="/css/post.css" />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="top">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Ranjith Kumar MV – home"><span class="brand-mark">RK</span>Ranjith Kumar MV</a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/#about">About</a></li>
+      <li><a href="/#experience">Experience</a></li>
+      <li><a href="/blog/" class="active">Blog</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+    <button class="icon-btn theme-btn" id="theme-btn" type="button" aria-label="Toggle dark mode"><i class="fa fa-moon-o" aria-hidden="true"></i></button>
+    <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links"><i class="fa fa-bars" aria-hidden="true"></i></button>
+  </div>
+</header>
+
+<main id="main">
+  <article class="post-wrap">
+    <header class="article-head">
+      <a class="crumb" href="/blog/">← Blog</a>
+      <h1>Migrating a 17-year-old WebLogic system to microservices with zero downtime</h1>
+      <p class="dek">How we moved Customer Vault and Bank Core off a legacy WebLogic platform — by shadowing live traffic with Envoy, proving parity with OpenDiffy, and shifting users over a percentage at a time.</p>
+      <div class="byline">
+        <span class="brand-mark" aria-hidden="true">RK</span>
+        <div><b>Ranjith Kumar MV</b><time datetime="2026-10-08">8 October 2026</time> · <span id="read-time">8 min read</span></div>
+      </div>
+      <ul class="tags inline"><li>Migration</li><li>Envoy</li><li>OpenDiffy</li><li>Microservices</li><li>Platform engineering</li></ul>
+    </header>
+
+    <div class="prose">
+      <section class="tldr" aria-label="Summary">
+        <h2>TL;DR</h2>
+        <ul>
+          <li><strong>What:</strong> Customer Vault and Bank Core, running on a WebLogic platform for 17 years, rebuilt as microservices.</li>
+          <li><strong>Constraint:</strong> zero downtime — these services sit on the critical path for payments.</li>
+          <li><strong>How:</strong> Envoy in front of both stacks, <em>shadowing</em> live requests to the new services; OpenDiffy comparing old and new responses for <em>parity</em>; then <em>percentage-based</em> traffic shifting with instant rollback.</li>
+        </ul>
+      </section>
+
+      <h2>The problem with a 17-year-old system</h2>
+      <p>As Lead Platform Engineer, one of the most consequential projects I led was retiring the WebLogic platform behind two business-critical services: <strong>Customer Vault</strong> and <strong>Bank Core</strong>. The platform had been in production for 17 years. It worked — that was the hard part. Nearly two decades of behaviour, edge cases and quiet assumptions were encoded in it, and much of that behaviour was documented nowhere except in the code and in the responses it returned.</p>
+      <p>Keeping it was getting more expensive every year: an ageing application server, slow and risky releases, a shrinking pool of people who understood it, and an architecture that couldn't scale parts of the system independently. Rewriting it as microservices was the right destination. The real question was how to get there safely.</p>
+
+      <h2>Why not a big-bang cutover?</h2>
+      <p>The classic approach — build the new system, schedule a maintenance window, switch over and hope — fails on both of our constraints:</p>
+      <ul>
+        <li><strong>Downtime wasn't acceptable.</strong> These services are on the payment path; a maintenance window is a business outage.</li>
+        <li><strong>"Hope" isn't a test strategy.</strong> No test suite written from today's understanding could capture 17 years of production behaviour. The only complete specification of the legacy system was the legacy system itself.</li>
+      </ul>
+      <p>That second point shaped the whole approach. Instead of asking <em>"does the new system pass our tests?"</em>, we asked <em>"does the new system behave exactly like the old one, on real production traffic?"</em> — and we answered it before a single customer request depended on the new code.</p>
+
+      <h2>The architecture</h2>
+      <p>We put an <a href="https://www.envoyproxy.io/" target="_blank" rel="noopener">Envoy</a> proxy in front of both stacks. Every request went through Envoy, which gave us one place to control routing without touching clients or the legacy code.</p>
+
+      <figure>
+        <div class="diagram">
+          <svg viewBox="0 0 700 330" role="img" aria-labelledby="diag-title diag-desc">
+            <title id="diag-title">Migration architecture</title>
+            <desc id="diag-desc">Clients call Envoy. Envoy sends live traffic to the WebLogic monolith and, by percentage, to the new microservices. Envoy also mirrors requests to OpenDiffy, which replays them against both systems and compares the responses.</desc>
+            <defs>
+              <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+              <marker id="ahl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow live" d="M0 0 L10 5 L0 10 z"/></marker>
+            </defs>
+            <!-- client -->
+            <rect class="box" x="10" y="135" width="120" height="60" rx="12"/>
+            <text class="t" x="70" y="161" text-anchor="middle">Clients</text>
+            <text class="s" x="70" y="180" text-anchor="middle">unchanged</text>
+            <!-- envoy -->
+            <rect class="box hl" x="190" y="120" width="170" height="90" rx="12"/>
+            <text class="t" x="275" y="155" text-anchor="middle">Envoy</text>
+            <text class="s" x="275" y="175" text-anchor="middle">weighted routing</text>
+            <text class="s" x="275" y="192" text-anchor="middle">+ request mirroring</text>
+            <!-- legacy -->
+            <rect class="box" x="450" y="12" width="240" height="70" rx="12"/>
+            <text class="t" x="570" y="42" text-anchor="middle">WebLogic monolith</text>
+            <text class="s" x="570" y="62" text-anchor="middle">legacy · source of truth</text>
+            <!-- diffy -->
+            <rect class="box" x="450" y="130" width="240" height="70" rx="12"/>
+            <text class="t" x="570" y="160" text-anchor="middle">OpenDiffy</text>
+            <text class="s" x="570" y="180" text-anchor="middle">replays &amp; compares responses</text>
+            <!-- new -->
+            <rect class="box hl" x="450" y="248" width="240" height="70" rx="12"/>
+            <text class="t" x="570" y="278" text-anchor="middle">Microservices</text>
+            <text class="s" x="570" y="298" text-anchor="middle">Customer Vault · Bank Core</text>
+            <!-- arrows -->
+            <path class="line" d="M130 165 H186" marker-end="url(#ah)"/>
+            <path class="line live" d="M360 140 C 405 140, 405 47, 446 47" marker-end="url(#ahl)"/>
+            <path class="line live" d="M360 190 C 405 190, 405 283, 446 283" marker-end="url(#ahl)"/>
+            <path class="line dash" d="M360 165 H446" marker-end="url(#ah)"/>
+            <path class="line dash" d="M640 130 V86" marker-end="url(#ah)"/>
+            <path class="line dash" d="M640 200 V244" marker-end="url(#ah)"/>
+            <text class="lbl" x="396" y="62" text-anchor="end">live · 100% → 0%</text>
+            <text class="lbl" x="396" y="276" text-anchor="end">live · 0% → 100%</text>
+            <text class="lbl" x="372" y="158">mirror</text>
+            <text class="lbl" x="580" y="112" text-anchor="end">primary</text>
+            <text class="lbl" x="580" y="228" text-anchor="end">candidate</text>
+          </svg>
+        </div>
+        <figcaption>Live traffic (solid) moves from WebLogic to the microservices by weight; mirrored traffic (dashed) drives the parity checks.</figcaption>
+      </figure>
+
+      <p>The migration then ran in four phases:</p>
+      <ol class="phases">
+        <li><b>Shadow</b><span>Mirror live production requests to the new services. Customers only ever see the legacy response.</span></li>
+        <li><b>Prove parity</b><span>Use OpenDiffy to compare legacy and new responses, and fix differences until the diff is clean.</span></li>
+        <li><b>Shift traffic gradually</b><span>Move real users over a small percentage at a time, with rollback a single config change away.</span></li>
+        <li><b>Decommission</b><span>At 100% and stable, retire the WebLogic platform.</span></li>
+      </ol>
+
+      <h2>Phase 1 — Shadow traffic with Envoy</h2>
+      <p>Envoy's <code>request_mirror_policies</code> send a copy of each request to a second cluster in a fire-and-forget fashion: the client gets the response from the primary route, and the shadow response is discarded. That let the new services see the full shape of production traffic — real payloads, real volumes, real edge cases — while carrying zero customer risk.</p>
+<pre><code><span class="c"># Envoy route: serve from WebLogic, mirror every request for comparison</span>
+<span class="k">routes</span>:
+- <span class="k">match</span>: { <span class="k">prefix</span>: <span class="v">"/"</span> }
+  <span class="k">route</span>:
+    <span class="k">cluster</span>: <span class="v">weblogic_legacy</span>
+    <span class="k">request_mirror_policies</span>:
+    - <span class="k">cluster</span>: <span class="v">diffy_proxy</span>
+      <span class="k">runtime_fraction</span>:
+        <span class="k">default_value</span>: { <span class="k">numerator</span>: <span class="v">100</span>, <span class="k">denominator</span>: <span class="v">HUNDRED</span> }</code></pre>
+      <p class="code-cap">Simplified example. <code>runtime_fraction</code> lets you start by mirroring a small share of traffic and raise it at runtime.</p>
+      <p>Two details matter when shadowing anything that touches money or customer data:</p>
+      <ul>
+        <li><strong>Shadow requests must never cause real side effects.</strong> A mirrored write that actually commits is a duplicate transaction. The shadow path has to be isolated from anything customer-visible — its own data store, stubbed downstream calls, or a mode that validates without committing.</li>
+        <li><strong>Make shadow traffic identifiable.</strong> Envoy appends <code>-shadow</code> to the <code>Host</code> header of mirrored requests, which makes them easy to tag in logs and metrics and to exclude from business reporting.</li>
+      </ul>
+
+      <h2>Phase 2 — Proving parity with OpenDiffy</h2>
+      <p>Shadowing tells you the new system <em>responds</em>. It doesn't tell you it responds <em>correctly</em>. For that we used <a href="https://github.com/opendiffy/diffy" target="_blank" rel="noopener">OpenDiffy</a>, the open-source successor to Twitter's Diffy.</p>
+      <p>Diffy sits behind the mirror and sends each request to three targets:</p>
+      <ul>
+        <li><strong>Primary</strong> — the legacy WebLogic system.</li>
+        <li><strong>Secondary</strong> — a second legacy instance.</li>
+        <li><strong>Candidate</strong> — the new microservice.</li>
+      </ul>
+      <p>The secondary is the clever part. Comparing primary with secondary shows which fields differ <em>even between two copies of the same code</em> — timestamps, generated IDs, ordering of unordered collections. Diffy treats those fields as noise and filters them out of the primary-vs-candidate comparison. What's left are real behavioural differences.</p>
+<pre><code><span class="c"># Illustrative OpenDiffy setup</span>
+docker run -d --name diffy -p 8880:8880 -p 8888:8888 diffy/diffy \
+  -candidate=<span class="v">vault-service:8080</span> \
+  -master.primary=<span class="v">weblogic-a:7001</span> \
+  -master.secondary=<span class="v">weblogic-b:7001</span> \
+  -service.protocol=<span class="v">http</span> \
+  -serviceName=<span class="v">customer-vault</span> \
+  -proxy.port=<span class="v">:8880</span> -http.port=<span class="v">:8888</span> -rootUrl=<span class="v">localhost:8888</span></code></pre>
+      <p>Diffy's dashboard groups differences by endpoint and field, which turned "the new system is different somehow" into a concrete, prioritised work list. Each difference fell into one of three buckets:</p>
+      <ul>
+        <li><strong>A bug in the new service</strong> — fix it and redeploy the candidate.</li>
+        <li><strong>An undocumented legacy behaviour</strong> that clients relied on — replicate it, and write it down this time.</li>
+        <li><strong>An intentional, agreed change</strong> — exclude it from the comparison explicitly, so it can't hide anything else.</li>
+      </ul>
+      <p class="callout">The bar for moving on was a clean diff on real production traffic, endpoint by endpoint — not a passing test suite.</p>
+
+      <h2>Phase 3 — Percentage-based migration</h2>
+      <p>Once an endpoint showed parity, we started sending it real traffic using Envoy's <code>weighted_clusters</code>. The weight is just configuration, so moving forward — or rolling back — needed no deployment of either application.</p>
+<pre><code><span class="c"># Envoy route: 95% legacy, 5% new — keep mirroring for continued comparison</span>
+<span class="k">route</span>:
+  <span class="k">weighted_clusters</span>:
+    <span class="k">clusters</span>:
+    - { <span class="k">name</span>: <span class="v">weblogic_legacy</span>,    <span class="k">weight</span>: <span class="v">95</span> }
+    - { <span class="k">name</span>: <span class="v">vault_microservice</span>, <span class="k">weight</span>: <span class="v">5</span> }</code></pre>
+      <p>We ramped in steps, holding at each stage long enough to watch error rates, latency and business metrics before going further:</p>
+
+      <figure aria-label="Example traffic ramp">
+        <div class="ramp" aria-hidden="true">
+          <div style="height:4%"><span>1%</span></div>
+          <div style="height:8%"><span>5%</span></div>
+          <div style="height:15%"><span>10%</span></div>
+          <div style="height:28%"><span>25%</span></div>
+          <div style="height:52%"><span>50%</span></div>
+          <div style="height:76%"><span>75%</span></div>
+          <div style="height:100%"><span>100%</span></div>
+        </div>
+        <div class="ramp-cap" aria-hidden="true"><span>Canary</span><span></span><span></span><span></span><span>Half</span><span></span><span>Done</span></div>
+        <figcaption>An example ramp: each step is a weight change in Envoy, and rollback is setting the weight back.</figcaption>
+      </figure>
+
+      <p>A few things made the ramp safe:</p>
+      <ul>
+        <li><strong>Rollback was one config change.</strong> If anything looked wrong, the weight went back to the legacy cluster in seconds — no redeploy, no data repair.</li>
+        <li><strong>Endpoint by endpoint, not all at once.</strong> Routes that reached parity early could move ahead of the rest, so one difficult endpoint didn't block everything else.</li>
+        <li><strong>Watch the same metrics on both sides.</strong> Error rate, latency percentiles and business-level outcomes, compared between the legacy and new clusters at the same moment.</li>
+      </ul>
+
+      <h2>Phase 4 — Turning off WebLogic</h2>
+      <p>With all traffic on the microservices and the system stable, the WebLogic platform could finally be retired — after 17 years, without customers ever noticing the switch. That's the goal of a migration like this: the best outcome is that nobody outside the team can tell it happened.</p>
+
+      <h2>Lessons I'd take to the next migration</h2>
+      <ul>
+        <li><strong>Production traffic is the only complete spec</strong> of a long-lived system. Design the migration around observing it, not around documents describing it.</li>
+        <li><strong>Separate "it runs" from "it's correct".</strong> Shadowing proves the first; parity checks prove the second. You need both.</li>
+        <li><strong>Invest early in noise filtering.</strong> A diff tool that reports thousands of timestamp differences gets ignored. Diffy's primary/secondary trick is what made the signal usable.</li>
+        <li><strong>Make every step reversible.</strong> When rollback is a config change, small steps are cheap — and small steps are what made zero downtime achievable.</li>
+        <li><strong>Treat side effects as the main risk.</strong> In payments, a duplicated write is worse than a failed read. Decide how the shadow path stays isolated before mirroring the first request.</li>
+      </ul>
+    </div>
+
+    <aside class="author-card">
+      <span class="brand-mark" aria-hidden="true">RK</span>
+      <div>
+        <b>Ranjith Kumar MV</b>
+        <p>Associate Architect at Paysafe, working on platform engineering, cloud infrastructure and data engineering. <a href="/">More about me</a> · <a href="https://www.linkedin.com/in/ranjithkumarmv" target="_blank" rel="noopener">LinkedIn</a></p>
+      </div>
+    </aside>
+  </article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>© <span id="year">2026</span> Ranjith Kumar MV</p>
+    <ul class="socials">
+      <li><a href="https://www.linkedin.com/in/ranjithkumarmv" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+      <li><a href="https://github.com/ranjithkumarmv" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a></li>
+      <li><a href="https://twitter.com/ranjithkmrmv" target="_blank" rel="noopener" aria-label="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+    </ul>
+  </div>
+</footer>
+
+<script src="/js/site.js" defer></script>
+<script>
+  // reading time from the article body
+  (function () {
+    var words = document.querySelector(".prose").innerText.trim().split(/\s+/).length;
+    document.getElementById("read-time").textContent = Math.max(1, Math.round(words / 230)) + " min read";
+  })();
+</script>
+</body>
+</html>

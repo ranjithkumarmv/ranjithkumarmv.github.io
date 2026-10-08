@@ -33,9 +33,69 @@
   links.addEventListener("click", function (e) { if (e.target.tagName === "A") setMenu(false); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") setMenu(false); });
 
-  // nav border on scroll + active section link
+  // nav border, reading progress and career timeline fill — all driven by scroll
   var nav = document.querySelector(".nav");
-  window.addEventListener("scroll", function () { nav.classList.toggle("scrolled", window.scrollY > 8); }, { passive: true });
+  var progress = document.getElementById("progress");
+  var roles = document.getElementById("roles");
+  var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // timeline track runs from the first role's dot to the last one's
+  function measureRoles() {
+    if (!roles) return;
+    var dots = roles.querySelectorAll(".role");
+    var first = dots[0].offsetTop + 36, last = dots[dots.length - 1].offsetTop + 36;
+    roles.style.setProperty("--top", first + "px");
+    roles.style.setProperty("--len", (last - first) + "px");
+  }
+
+  var ticking = false;
+  function onScroll() {
+    ticking = false;
+    var y = window.scrollY, max = document.documentElement.scrollHeight - window.innerHeight;
+    nav.classList.toggle("scrolled", y > 8);
+    if (progress) progress.style.setProperty("--p", max > 0 ? y / max : 0);
+    if (roles) {
+      var r = roles.getBoundingClientRect(), mid = window.innerHeight * .6;
+      var fill = still ? 1 : Math.min(1, Math.max(0, (mid - r.top) / r.height));
+      roles.style.setProperty("--fill", fill);
+    }
+  }
+  window.addEventListener("scroll", function () {
+    if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+  }, { passive: true });
+  window.addEventListener("resize", function () { measureRoles(); onScroll(); });
+  window.addEventListener("load", function () { measureRoles(); onScroll(); });
+  measureRoles();
+  onScroll();
+
+  // pointer-following spotlight on cards
+  document.querySelectorAll(".glow").forEach(function (card) {
+    card.addEventListener("pointermove", function (e) {
+      var r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+      card.style.setProperty("--my", (e.clientY - r.top) + "px");
+    });
+  });
+
+  // stagger reveals that sit side by side in a grid
+  document.querySelectorAll(".bento, .beyond-grid").forEach(function (grid) {
+    Array.prototype.forEach.call(grid.children, function (el, i) { el.style.setProperty("--d", (i % 3) * .08 + "s"); });
+  });
+
+  // count the hero stats up from zero
+  function countUp(dd) {
+    var target = +dd.dataset.count, text = dd.firstChild, start = null;
+    if (still || !text) return;
+    function step(t) {
+      if (start === null) start = t;
+      var k = Math.min(1, (t - start) / 1200);
+      text.nodeValue = Math.round(target * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(step);
+    }
+    text.nodeValue = "0";
+    requestAnimationFrame(step);
+  }
+  document.querySelectorAll(".stats dd[data-count]").forEach(countUp);
 
   if ("IntersectionObserver" in window) {
     var navLinks = links.querySelectorAll("a");
@@ -58,15 +118,19 @@
     document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
   }
 
-  // QR dialog
+  // QR dialog (homepage only)
   var qr = document.getElementById("qr");
-  document.getElementById("qr-open").addEventListener("click", function () {
-    if (qr.showModal) qr.showModal(); else qr.setAttribute("open", "");
-  });
-  qr.addEventListener("click", function (e) { if (e.target === qr) qr.close(); });
+  var qrOpen = document.getElementById("qr-open");
+  if (qr && qrOpen) {
+    qrOpen.addEventListener("click", function () {
+      if (qr.showModal) qr.showModal(); else qr.setAttribute("open", "");
+    });
+    qr.addEventListener("click", function (e) { if (e.target === qr) qr.close(); });
+  }
 
-  // contact form → postmail.invotes.com
+  // contact form → postmail.invotes.com (homepage only)
   var form = document.getElementById("contact-form");
+  if (!form) return;
   var sendBtn = document.getElementById("f-send");
   var status = document.getElementById("f-status");
   var sendLabel = sendBtn.innerHTML;
