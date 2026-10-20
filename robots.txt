@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
 
+# AI assistants and LLM crawlers are welcome. Plain-text index: https://ranjithkumarmv.com/llms.txt
+
 Sitemap: https://ranjithkumarmv.com/sitemap.xml

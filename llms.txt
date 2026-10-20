@@ -1,0 +1,21 @@
+# Ranjith Kumar MV
+
+> Personal site of Ranjith Kumar MV, Associate Architect at Paysafe (Hyderabad, India). Writing on platform architecture, legacy migrations, data engineering, cloud infrastructure on AWS, and open-source Node.js tools.
+
+Each blog post below has a clean Markdown version for language models, linked first; the HTML page is the canonical source for people.
+
+## Blog
+
+- [Fast parallel S3 downloads in Node.js with s3-multipartdownload](https://ranjithkumarmv.com/blog/parallel-s3-downloads-nodejs.md): How to download large Amazon S3 objects faster in Node.js by fetching byte ranges in parallel with AWS SDK v3 and streaming them to disk, using the open-source npm package s3-multipartdownload. Includes usage, options, benchmarks and FAQ. ([HTML](https://ranjithkumarmv.com/blog/parallel-s3-downloads-nodejs.html))
+- [Migrating a 17-year-old WebLogic system to microservices with zero downtime](https://ranjithkumarmv.com/blog/weblogic-to-microservices-zero-downtime-migration.html): Envoy request shadowing, OpenDiffy parity checks and percentage-based traffic shifting at Paysafe.
+- [The bitcoin miner I imported in 2016](https://ranjithkumarmv.com/blog/antminer-s9-home-bitcoin-mining-2016.html): An Antminer S9, a mining farm plan undone by demonetisation, and Slush Pool payouts.
+
+## Open source
+
+- [s3-multipartdownload on npm](https://www.npmjs.com/package/s3-multipartdownload): Parallel ranged S3 downloads for Node.js (AWS SDK v3). MIT licensed.
+- [s3-multipartdownload on GitHub](https://github.com/ranjithkumarmv/s3-multipartdownload): Source, README, benchmarks. An LLM-oriented reference is at [llms.txt](https://raw.githubusercontent.com/ranjithkumarmv/s3-multipartdownload/main/llms.txt).
+
+## About
+
+- [Home](https://ranjithkumarmv.com/): Profile, expertise and experience.
+- [CV](https://ranjithkumarmv.com/cv.html): Full résumé.
