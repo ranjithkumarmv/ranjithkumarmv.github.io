@@ -93,7 +93,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/font-awesome.css" />
 <link rel="stylesheet" href="/css/site.css" />
-<link rel="stylesheet" href="/css/post.css?v=20261020" />
+<link rel="stylesheet" href="/css/post.css?v=20261021" />
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -115,7 +115,7 @@
 
 <main id="main">
   <article class="post-wrap">
-    <header class="article-head">
+    <header class="article-head head-s3">
       <div class="hero-bg" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="grid"></span></div>
       <a class="crumb" href="/blog/"><i class="fa fa-arrow-left" aria-hidden="true"></i> All posts</a>
       <h1>Fast parallel S3 downloads in Node.js with s3-multipartdownload</h1>
@@ -125,6 +125,29 @@
         <div><b>Ranjith Kumar MV</b><time datetime="2021-09">Sep 2021</time> · <span id="read-time">7 min read</span></div>
       </div>
       <ul class="tags inline"><li>Open source</li><li>Node.js</li><li>AWS S3</li><li>Performance</li></ul>
+      <section class="race" data-speed="2" aria-label="Benchmark results: downloading a 500 MB object">
+        <div class="race-head">
+          <div>
+            <p class="race-kicker">Benchmark · 500 MB object</p>
+            <p class="race-big">14.3 s <span aria-hidden="true">→</span> <em>2.0 s</em></p>
+          </div>
+          <dl class="race-stats">
+            <div><dt>faster</dt><dd>7.1×</dd></div>
+            <div><dt>throughput</dt><dd>249 MB/s</dd></div>
+            <div><dt>peak memory</dt><dd>~130 MB</dd></div>
+          </dl>
+        </div>
+        <ol class="race-lanes">
+          <li class="race-lane base" data-parts="1" data-time="14.29"><span class="race-name">Single GetObject<small>1 connection</small></span><span class="race-track"><i></i></span><span class="race-time">14.3 s</span></li>
+          <li class="race-lane" data-parts="4" data-time="4.48"><span class="race-name">Parallel ×4<small>4 byte ranges</small></span><span class="race-track"><i></i></span><span class="race-time">4.5 s</span></li>
+          <li class="race-lane" data-parts="8" data-time="2.49"><span class="race-name">Parallel ×8<small>8 byte ranges</small></span><span class="race-track"><i></i></span><span class="race-time">2.5 s</span></li>
+          <li class="race-lane" data-parts="16" data-time="2.01"><span class="race-name">Parallel ×16<small>16 byte ranges</small></span><span class="race-track"><i></i></span><span class="race-time">2.0 s</span></li>
+        </ol>
+        <div class="race-foot">
+          <span>Replayed at 2× speed · median of 3 runs on a simulated S3 server · <a href="#benchmarks-how-much-faster">full results</a></span>
+          <button class="race-replay" type="button" hidden><i class="fa fa-repeat" aria-hidden="true"></i> Replay</button>
+        </div>
+      </section>
     </header>
 
     <nav class="toc" id="toc" aria-label="On this page"><p>On this page</p><ol id="toc-list"></ol></nav>
@@ -337,7 +360,7 @@ console.log(<span class="v">'Saved to'</span>, file) <span class="c">// ./downlo
   </div>
 </footer>
 
-<script src="/js/post.js" defer></script>
+<script src="/js/post.js?v=20261021" defer></script>
 <script src="/js/site.js" defer></script>
 </body>
 </html>

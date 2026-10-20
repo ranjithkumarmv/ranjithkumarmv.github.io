@@ -63,6 +63,50 @@
     el.classList.add("reveal");
   });
 
+  // benchmark race: each lane fills its byte ranges in proportion to the measured time
+  document.querySelectorAll(".race").forEach(function (race) {
+    var speed = Number(race.dataset.speed) || 1;
+    var lanes = [].map.call(race.querySelectorAll(".race-lane"), function (li) {
+      var track = li.querySelector(".race-track"), parts = Number(li.dataset.parts), t = Number(li.dataset.time);
+      var cells = [];
+      track.textContent = "";
+      for (var i = 0; i < parts; i++) {
+        var cell = document.createElement("i");
+        track.appendChild(cell);
+        // ranges finish a little apart; the last one sets the lane's time
+        cells.push({ el: cell, k: i === parts - 1 ? 1 : 0.8 + 0.2 * ((i * 37) % 17) / 17 });
+      }
+      return { li: li, t: t, cells: cells, out: li.querySelector(".race-time") };
+    });
+    var end = Math.max.apply(null, lanes.map(function (l) { return l.t; }));
+    var start = 0, raf = 0;
+
+    function draw(s) {
+      lanes.forEach(function (l) {
+        l.cells.forEach(function (c) { c.el.style.setProperty("--f", Math.min(1, s / (l.t * c.k))); });
+        var done = s >= l.t;
+        l.li.classList.toggle("done", done);
+        l.out.textContent = (done ? l.t : s).toFixed(1) + " s";
+      });
+    }
+    function tick(now) {
+      if (!start) start = now;
+      var s = (now - start) / 1000 * speed;
+      draw(Math.min(s, end));
+      if (s < end) raf = requestAnimationFrame(tick);
+    }
+    function play() { cancelAnimationFrame(raf); start = 0; draw(0); raf = requestAnimationFrame(tick); }
+
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) { draw(end); return; }
+    draw(0);
+    var io = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) { io.disconnect(); setTimeout(play, 500); }
+    }, { threshold: 0.4 });
+    io.observe(race);
+    var replay = race.querySelector(".race-replay");
+    if (replay) { replay.hidden = false; replay.addEventListener("click", play); }
+  });
+
   // contents: show once the header is passed, highlight the section being read
   if (!toc || !headings.length || !("IntersectionObserver" in window)) return;
   var head = document.querySelector(".article-head");
