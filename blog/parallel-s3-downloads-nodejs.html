@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fast parallel S3 downloads in Node.js with s3-multipartdownload – Ranjith Kumar MV</title>
+<meta name="description" content="Download large Amazon S3 files up to 7× faster in Node.js. s3-multipartdownload fetches byte ranges in parallel with AWS SDK v3 and streams them straight to disk." />
+<meta name="keywords" content="s3 parallel download, node.js s3 download large file, aws sdk v3 download, s3 range get, s3 multipart download, s3 getobject range, fast s3 download, s3-multipartdownload" />
+<meta name="author" content="Ranjith Kumar MV" />
+<link rel="canonical" href="https://ranjithkumarmv.com/blog/parallel-s3-downloads-nodejs.html" />
+<meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Ranjith Kumar MV" />
+<meta property="og:url" content="https://ranjithkumarmv.com/blog/parallel-s3-downloads-nodejs.html" />
+<meta property="og:title" content="Fast parallel S3 downloads in Node.js with s3-multipartdownload" />
+<meta property="og:description" content="Split large S3 objects into byte ranges, fetch them concurrently with AWS SDK v3, and stream them to disk. 14.3 s became 2.0 s for a 500 MB object in my benchmark." />
+<meta property="og:image" content="https://ranjithkumarmv.com/images/og-card.png" />
+<meta property="article:published_time" content="2026-10-20" />
+<meta property="article:author" content="Ranjith Kumar MV" />
+<meta property="article:tag" content="Node.js" />
+<meta property="article:tag" content="AWS S3" />
+<meta property="article:tag" content="Open source" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:creator" content="@ranjithkmrmv" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "Fast parallel S3 downloads in Node.js with s3-multipartdownload",
+      "description": "Download large Amazon S3 files up to 7× faster in Node.js. s3-multipartdownload fetches byte ranges in parallel with AWS SDK v3 and streams them straight to disk.",
+      "datePublished": "2026-10-20",
+      "dateModified": "2026-10-20",
+      "image": "https://ranjithkumarmv.com/images/og-card.png",
+      "mainEntityOfPage": "https://ranjithkumarmv.com/blog/parallel-s3-downloads-nodejs.html",
+      "proficiencyLevel": "Intermediate",
+      "dependencies": "Node.js 20.3+, @aws-sdk/client-s3 v3",
+      "keywords": ["s3 parallel download", "Node.js", "AWS SDK v3", "S3 range GET", "multipart download", "s3-multipartdownload"],
+      "author": { "@type": "Person", "name": "Ranjith Kumar MV", "url": "https://ranjithkumarmv.com/" },
+      "about": { "@id": "https://www.npmjs.com/package/s3-multipartdownload" }
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://www.npmjs.com/package/s3-multipartdownload",
+      "name": "s3-multipartdownload",
+      "description": "Fast parallel S3 downloads for Node.js using byte-range requests and AWS SDK v3.",
+      "codeRepository": "https://github.com/ranjithkumarmv/s3-multipartdownload",
+      "programmingLanguage": "JavaScript",
+      "runtimePlatform": "Node.js",
+      "license": "https://opensource.org/licenses/MIT",
+      "author": { "@type": "Person", "name": "Ranjith Kumar MV", "url": "https://ranjithkumarmv.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is a multipart download the same as S3 multipart upload?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Multipart upload is an S3 API. A multipart download is a client-side technique: several HTTP Range requests against an ordinary GetObject. It works on any object, however it was uploaded." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does downloading S3 objects in parallel cost more?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Each part is one GET request. A 1 GB object in 8 MiB parts is 128 requests, a fraction of a cent at standard S3 request pricing. The bytes transferred are the same as a single download." }
+        },
+        {
+          "@type": "Question",
+          "name": "How is s3-multipartdownload different from aws s3 cp?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The AWS CLI also downloads in parallel and is the right tool for shell scripts. s3-multipartdownload brings the same technique inside a Node.js app, Lambda function or worker, with your own S3Client, a progress callback and AbortSignal support." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it work with MinIO, Cloudflare R2 and other S3-compatible storage?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. It only needs HeadObject and ranged GetObject, so any S3-compatible service works: point the S3Client at its endpoint." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<script>try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/font-awesome.css" />
+<link rel="stylesheet" href="/css/site.css" />
+<link rel="stylesheet" href="/css/post.css" />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<header class="nav" id="top">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Ranjith Kumar MV – home"><span class="brand-mark">RK</span>Ranjith Kumar MV</a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/#about">About</a></li>
+      <li><a href="/#experience">Experience</a></li>
+      <li><a href="/blog/" class="active">Blog</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+    <button class="icon-btn theme-btn" id="theme-btn" type="button" aria-label="Toggle dark mode"><i class="fa fa-moon-o" aria-hidden="true"></i></button>
+    <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links"><i class="fa fa-bars" aria-hidden="true"></i></button>
+  </div>
+</header>
+
+<main id="main">
+  <article class="post-wrap">
+    <header class="article-head">
+      <div class="hero-bg" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="grid"></span></div>
+      <a class="crumb" href="/blog/"><i class="fa fa-arrow-left" aria-hidden="true"></i> All posts</a>
+      <h1>Fast parallel S3 downloads in Node.js with s3-multipartdownload</h1>
+      <p class="dek">A single <code>GetObject</code> uses one connection, and one connection rarely fills your bandwidth. Here's how my open-source package splits large S3 objects into byte ranges, downloads them side by side, and streams them straight to disk.</p>
+      <div class="byline">
+        <span class="brand-mark" aria-hidden="true">RK</span>
+        <div><b>Ranjith Kumar MV</b><time datetime="2026-10-20">20 Oct 2026</time> · <span id="read-time">7 min read</span></div>
+      </div>
+      <ul class="tags inline"><li>Open source</li><li>Node.js</li><li>AWS S3</li><li>Performance</li></ul>
+    </header>
+
+    <nav class="toc" id="toc" aria-label="On this page"><p>On this page</p><ol id="toc-list"></ol></nav>
+
+    <div class="prose">
+      <section class="tldr" aria-label="Summary">
+        <h2>TL;DR</h2>
+        <ul>
+          <li><strong>Problem:</strong> AWS SDK v3 for JavaScript has a managed uploader but no parallel downloader, so a large <code>GetObject</code> crawls over one connection.</li>
+          <li><strong>Fix:</strong> <a href="https://www.npmjs.com/package/s3-multipartdownload" target="_blank" rel="noopener">s3-multipartdownload</a> fetches byte ranges concurrently and writes each one at its offset in the output file.</li>
+          <li><strong>Result:</strong> a 500 MB object went from 14.3 s to 2.0 s in my benchmark (7.1×), with memory flat at about 130 MB.</li>
+        </ul>
+      </section>
+
+      <h2>Why one GetObject is slow</h2>
+      <p>When you download an object with the AWS SDK, the whole thing comes back over one HTTP response on one TCP connection. Each connection to S3 has a throughput ceiling well below what a modern machine or EC2 instance can pull, so most of your bandwidth sits idle.</p>
+      <p>AWS's own <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance-guidelines.html" target="_blank" rel="noopener">S3 performance guidelines</a> describe the answer: request byte ranges of the object with the <code>Range</code> header and fetch them concurrently. The AWS CLI, and the transfer managers in the Java and Python SDKs, do this for you. In Node.js, <code>@aws-sdk/lib-storage</code> handles parallel <em>uploads</em>, but there is no equivalent for downloads.</p>
+      <p>I first wrote <a href="https://github.com/ranjithkumarmv/s3-multipartdownload" target="_blank" rel="noopener">s3-multipartdownload</a> in 2021 to close that gap. Version 2.0 is a full rewrite on AWS SDK v3.</p>
+
+      <h2>How it works</h2>
+      <p>The idea is simple: ask S3 how big the object is, carve it into fixed-size ranges, and run a small pool of workers that each fetch a range and write it into place.</p>
+
+      <figure>
+        <div class="diagram">
+          <svg viewBox="0 0 700 300" role="img" aria-labelledby="s3d-title s3d-desc">
+            <title id="s3d-title">How s3-multipartdownload works</title>
+            <desc id="s3d-desc">The app calls download. A HeadObject request returns the size and ETag. The object is split into 8 MiB ranges, and up to parallel_count GetObject range requests run at once, each pinned to the ETag. Each range streams into its offset of a pre-sized temp file, which is renamed to the final file when every part is done.</desc>
+            <defs>
+              <marker id="s3ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+              <marker id="s3ahl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow live" d="M0 0 L10 5 L0 10 z"/></marker>
+            </defs>
+            <rect class="box" x="10" y="20" width="150" height="64" rx="12"/>
+            <text class="t" x="85" y="48" text-anchor="middle">HeadObject</text>
+            <text class="s" x="85" y="68" text-anchor="middle">size + ETag</text>
+            <path class="line" d="M160 52 H228" marker-end="url(#s3ah)"/>
+            <rect class="box" x="230" y="20" width="200" height="64" rx="12"/>
+            <text class="t" x="330" y="48" text-anchor="middle">Pre-size temp file</text>
+            <text class="s" x="330" y="68" text-anchor="middle">file.download</text>
+            <path class="line" d="M330 84 V118" marker-end="url(#s3ah)"/>
+            <rect class="box hl" x="10" y="120" width="140" height="44" rx="10"/>
+            <text class="lbl" x="80" y="147" text-anchor="middle">Range 0 – 8 MiB</text>
+            <rect class="box hl" x="160" y="120" width="140" height="44" rx="10"/>
+            <text class="lbl" x="230" y="147" text-anchor="middle">Range 8 – 16 MiB</text>
+            <rect class="box hl" x="310" y="120" width="140" height="44" rx="10"/>
+            <text class="lbl" x="380" y="147" text-anchor="middle">Range 16 – 24 MiB</text>
+            <rect class="box" x="460" y="120" width="100" height="44" rx="10"/>
+            <text class="lbl" x="510" y="147" text-anchor="middle">… queued</text>
+            <text class="s" x="580" y="138">up to</text>
+            <text class="s" x="580" y="155">parallel_count</text>
+            <path class="line live dash" d="M80 164 V218" marker-end="url(#s3ahl)"/>
+            <path class="line live dash" d="M230 164 V218" marker-end="url(#s3ahl)"/>
+            <path class="line live dash" d="M380 164 V218" marker-end="url(#s3ahl)"/>
+            <rect class="box" x="10" y="220" width="550" height="64" rx="12"/>
+            <text class="t" x="285" y="248" text-anchor="middle">Each range streams to its own offset</text>
+            <text class="s" x="285" y="268" text-anchor="middle">If-Match: ETag on every part · retried on failure</text>
+            <path class="line" d="M560 252 H598" marker-end="url(#s3ah)"/>
+            <rect class="box hl" x="600" y="220" width="90" height="64" rx="12"/>
+            <text class="t" x="645" y="248" text-anchor="middle">Rename</text>
+            <text class="s" x="645" y="268" text-anchor="middle">→ final file</text>
+          </svg>
+        </div>
+        <figcaption>One HeadObject, then a bounded pool of ranged GETs writing straight into a pre-sized file.</figcaption>
+      </figure>
+
+      <ol class="phases">
+        <li><b>HeadObject</b><span>Reads the object's size and ETag.</span></li>
+        <li><b>Pre-size a temp file</b><span>Creating <code>file.download</code> at full size lets every part write at its own offset. No part files, no merge step.</span></li>
+        <li><b>Fetch ranges with a worker pool</b><span>At most <code>parallel_count</code> requests run at once. Each sends <code>If-Match: &lt;ETag&gt;</code>, so if the object is overwritten mid-download, the download fails instead of mixing two versions.</span></li>
+        <li><b>Retry, or cancel cleanly</b><span>A part that fails, even halfway through its stream, is retried with backoff. A fatal error cancels in-flight parts and deletes the temp file.</span></li>
+        <li><b>Rename</b><span>Only when every byte has landed does the temp file become the real one.</span></li>
+      </ol>
+
+      <h2>Install and quick start</h2>
+      <p>You need Node.js 20.3 or later. The AWS SDK is a peer dependency, so you keep control of its version and your client configuration.</p>
+<pre data-lang="Shell"><code>npm install s3-multipartdownload @aws-sdk/client-s3</code></pre>
+<pre data-lang="JavaScript"><code><span class="k">const</span> { S3Client } = require(<span class="v">'@aws-sdk/client-s3'</span>)
+<span class="k">const</span> { download } = require(<span class="v">'s3-multipartdownload'</span>)
+
+<span class="c">// Credentials come from the default provider chain (env, ~/.aws, SSO, IAM role)</span>
+<span class="k">const</span> s3 = <span class="k">new</span> S3Client({ region: <span class="v">'us-east-1'</span> })
+
+<span class="k">const</span> file = <span class="k">await</span> download(s3, { Bucket: <span class="v">'my-bucket'</span>, Key: <span class="v">'datasets/big-file.parquet'</span> }, {
+  download_dir: <span class="v">'./downloads'</span>,
+  parallel_count: <span class="v">8</span>
+})
+
+console.log(<span class="v">'Saved to'</span>, file) <span class="c">// ./downloads/big-file.parquet</span></code></pre>
+      <p class="code-cap">TypeScript types ship with the package, and ES module <code>import</code> works too.</p>
+
+      <h3>Show progress</h3>
+<pre data-lang="JavaScript"><code><span class="k">await</span> download(s3, params, {
+  onProgress: ({ downloadedBytes, totalBytes }) =&gt; {
+    <span class="k">const</span> pct = totalBytes ? (downloadedBytes / totalBytes) * <span class="v">100</span> : <span class="v">100</span>
+    process.stdout.write(<span class="v">`\r${pct.toFixed(1)}%`</span>)
+  }
+})</code></pre>
+
+      <h3>Cancel or time out</h3>
+<pre data-lang="JavaScript"><code><span class="c">// Give up after 60 seconds; the partial temp file is removed</span>
+<span class="k">await</span> download(s3, params, { abortSignal: AbortSignal.timeout(<span class="v">60_000</span>) })</code></pre>
+
+      <h3>Versions, encryption and requester pays</h3>
+      <p>Any <code>HeadObject</code> or <code>GetObject</code> parameter passes straight through, including <code>VersionId</code>, <code>SSECustomerKey</code> and <code>RequestPayer</code>.</p>
+<pre data-lang="JavaScript"><code><span class="k">await</span> download(s3, {
+  Bucket: <span class="v">'my-bucket'</span>,
+  Key: <span class="v">'secret.bin'</span>,
+  VersionId: <span class="v">'3HL4kqtJlcpXroDTDmJ'</span>,
+  SSECustomerAlgorithm: <span class="v">'AES256'</span>,
+  SSECustomerKey: process.env.SSE_KEY
+}, { download_dir: <span class="v">'./out'</span>, file_name: <span class="v">'secret-v3.bin'</span> })</code></pre>
+
+      <h3>MinIO, Cloudflare R2 and other S3-compatible storage</h3>
+<pre data-lang="JavaScript"><code><span class="k">const</span> s3 = <span class="k">new</span> S3Client({ endpoint: <span class="v">'https://&lt;account&gt;.r2.cloudflarestorage.com'</span>, region: <span class="v">'auto'</span> })
+<span class="k">await</span> download(s3, { Bucket: <span class="v">'assets'</span>, Key: <span class="v">'build.tar.gz'</span> })</code></pre>
+
+      <h2>Benchmarks: how much faster?</h2>
+      <p>I compared the standard SDK v3 approach (one <code>GetObject</code> piped to a file) with s3-multipartdownload at 4, 8 and 16 parallel ranges. Each strategy ran three times in its own process, and every downloaded file's SHA-256 matched the original.</p>
+
+      <figure>
+        <div class="diagram bench" role="img" aria-label="Throughput for a 500 MB object: single GetObject 35 MB/s; s3-multipartdownload with 4 parallel ranges 112 MB/s, 8 ranges 201 MB/s, 16 ranges 249 MB/s.">
+          <p class="bench-title">Throughput on a 500 MB object <span>MB/s · higher is better</span></p>
+          <div class="bench-row base"><span class="bench-name">Single GetObject</span><span class="bench-track"><span class="bench-bar" style="--w:14%"></span></span><span class="bench-val">35 <small>1.0×</small></span></div>
+          <div class="bench-row"><span class="bench-name">Parallel ×4</span><span class="bench-track"><span class="bench-bar" style="--w:45%"></span></span><span class="bench-val">112 <small>3.2×</small></span></div>
+          <div class="bench-row"><span class="bench-name">Parallel ×8</span><span class="bench-track"><span class="bench-bar" style="--w:81%"></span></span><span class="bench-val">201 <small>5.7×</small></span></div>
+          <div class="bench-row"><span class="bench-name">Parallel ×16</span><span class="bench-track"><span class="bench-bar" style="--w:100%"></span></span><span class="bench-val">249 <small>7.1×</small></span></div>
+        </div>
+        <figcaption>Median of 3 runs on a simulated S3 server. Full results are in the <a href="https://github.com/ranjithkumarmv/s3-multipartdownload/blob/main/bench/results/RESULTS.md" target="_blank" rel="noopener">repo</a>.</figcaption>
+      </figure>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Strategy</th><th>100 MB</th><th>500 MB</th><th>Peak memory</th></tr></thead>
+          <tbody>
+            <tr><td>Single <code>GetObject</code></td><td>2.91 s</td><td>14.29 s</td><td>134 MB</td></tr>
+            <tr><td>s3-multipartdownload ×4</td><td>1.01 s</td><td>4.48 s</td><td>133 MB</td></tr>
+            <tr><td>s3-multipartdownload ×8</td><td>0.55 s</td><td>2.49 s</td><td>130 MB</td></tr>
+            <tr><td>s3-multipartdownload ×16</td><td><strong>0.41 s</strong></td><td><strong>2.01 s</strong></td><td>127 MB</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>An honest note on the setup.</strong> These numbers come from a local S3-compatible server, not live Amazon S3. It caps each connection at 40 MB/s, total bandwidth at 400 MB/s, and adds 20 ms of latency per request, which models why parallelism helps. It ran on an Apple M1 with Node 22. At 16 parts the run levels off near 250 MB/s because the server and the downloader share one machine's CPU.</p>
+      <p>Your gains will depend on your network, region and instance size. The benchmark script runs against a real bucket too:</p>
+<pre data-lang="Shell"><code>node bench/benchmark.js --bucket my-bucket --key path/to/big.bin --region us-east-1</code></pre>
+      <p class="callout">Speed went up 7×. Memory didn't move. Streaming each range to disk means a 50 GB object costs no more RAM than a 50 MB one.</p>
+
+      <h2>Choosing parallel_count and part_size</h2>
+      <ul>
+        <li><strong>Laptops and small instances:</strong> <code>parallel_count</code> 4–8.</li>
+        <li><strong>EC2 in the same region as the bucket:</strong> start at 16–32 and raise it until throughput stops improving.</li>
+        <li><strong>Part size:</strong> keep the default 8 MiB, or go up to 16 MiB. Smaller parts add request overhead, and each part is a billed GET. Larger parts make each retry slower.</li>
+      </ul>
+      <p>Cost is rarely a concern. A 1 GB object at 8 MiB parts is 128 GET requests, a fraction of a cent at standard S3 pricing, and you transfer the same bytes either way.</p>
+
+      <h2>What's new in 2.0</h2>
+      <p>Version 1 was a quick wrapper on the now end-of-support AWS SDK v2. It buffered each part in memory, wrote part files, then merged them. The 2.0 rewrite fixes that design and several bugs:</p>
+      <ul>
+        <li><strong>AWS SDK v3</strong> with <code>S3Client</code> and commands, as a peer dependency.</li>
+        <li><strong>Streaming writes</strong> at file offsets replace part files and the merge step.</li>
+        <li><strong>Bounded concurrency</strong> over fixed-size parts, instead of exactly <code>parallel_count</code> giant parts.</li>
+        <li><strong>Reliability:</strong> per-part retries, ETag pinning, atomic rename and clean-up on failure.</li>
+        <li><strong>Bug fixes:</strong> a crash when the download folder didn't exist, an infinite loop on objects smaller than <code>parallel_count</code> bytes, and the library no longer modifies your params object.</li>
+        <li><strong>New options:</strong> <code>part_size</code>, <code>retries</code>, <code>file_name</code>, <code>abortSignal</code> and <code>onProgress</code>, plus TypeScript types.</li>
+      </ul>
+      <p>Upgrading from 1.x means passing an SDK v3 <code>S3Client</code> instead of an <code>AWS.S3</code> instance. The promise now resolves to the downloaded file's path.</p>
+
+      <h2>FAQ</h2>
+      <h3>Is this the same as S3 multipart upload?</h3>
+      <p>No. Multipart upload is an S3 API. A multipart download is a client-side technique: several HTTP <code>Range</code> requests against an ordinary <code>GetObject</code>. It works on any object, however it was uploaded.</p>
+      <h3>How is it different from <code>aws s3 cp</code>?</h3>
+      <p>The AWS CLI also downloads in parallel, and it's the right tool for shell scripts. This package brings the same technique inside a Node.js app, Lambda function or worker, with your own client, progress callbacks and cancellation.</p>
+      <h3>Can I download to a stream or a buffer?</h3>
+      <p>Not yet. Parts arrive out of order, so writing to known file offsets is what keeps memory flat. If you need it, <a href="https://github.com/ranjithkumarmv/s3-multipartdownload/issues" target="_blank" rel="noopener">open an issue</a>.</p>
+
+      <h2>Try it</h2>
+      <ul>
+        <li><strong>npm:</strong> <a href="https://www.npmjs.com/package/s3-multipartdownload" target="_blank" rel="noopener">s3-multipartdownload</a></li>
+        <li><strong>GitHub:</strong> <a href="https://github.com/ranjithkumarmv/s3-multipartdownload" target="_blank" rel="noopener">ranjithkumarmv/s3-multipartdownload</a> (MIT licensed; issues and pull requests welcome)</li>
+        <li><strong>Background reading:</strong> <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance-guidelines.html" target="_blank" rel="noopener">AWS S3 performance guidelines</a> and the <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html" target="_blank" rel="noopener">GetObject API reference</a></li>
+      </ul>
+      <p>If you work on platform and data infrastructure, you might also like how we <a href="/blog/weblogic-to-microservices-zero-downtime-migration.html">migrated a 17-year-old WebLogic system to microservices with zero downtime</a>.</p>
+    </div>
+
+    <aside class="author-card">
+      <span class="brand-mark" aria-hidden="true">RK</span>
+      <div>
+        <b>Ranjith Kumar MV</b>
+        <p>Associate Architect at Paysafe, working on platform engineering, cloud infrastructure and data engineering. <a href="/">More about me</a> · <a href="https://github.com/ranjithkumarmv" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/ranjithkumarmv" target="_blank" rel="noopener">LinkedIn</a></p>
+      </div>
+    </aside>
+    <a class="next-post" href="/blog/weblogic-to-microservices-zero-downtime-migration.html">
+      <span class="cover cover-migrate" aria-hidden="true"><i class="fa fa-random"></i></span>
+      <span class="next-body">
+        <span class="meta">Keep reading · Lead Platform Engineer · 2021 – 2023</span>
+        <b>Migrating a 17-year-old WebLogic system to microservices with zero downtime</b>
+      </span>
+      <i class="fa fa-arrow-right next-arrow" aria-hidden="true"></i>
+    </a>
+  </article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>© <span id="year">2026</span> Ranjith Kumar MV</p>
+    <ul class="socials">
+      <li><a href="https://www.linkedin.com/in/ranjithkumarmv" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+      <li><a href="https://github.com/ranjithkumarmv" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a></li>
+      <li><a href="https://twitter.com/ranjithkmrmv" target="_blank" rel="noopener" aria-label="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+    </ul>
+  </div>
+</footer>
+
+<script src="/js/post.js" defer></script>
+<script src="/js/site.js" defer></script>
+</body>
+</html>

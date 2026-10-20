@@ -10,7 +10,7 @@
   </url>
   <url>
     <loc>https://ranjithkumarmv.com/blog/</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ranjithkumarmv.com/blog/weblogic-to-microservices-zero-downtime-migration.html</loc>
@@ -19,5 +19,9 @@
   <url>
     <loc>https://ranjithkumarmv.com/blog/antminer-s9-home-bitcoin-mining-2016.html</loc>
     <lastmod>2026-10-08</lastmod>
+  </url>
+  <url>
+    <loc>https://ranjithkumarmv.com/blog/parallel-s3-downloads-nodejs.html</loc>
+    <lastmod>2026-10-20</lastmod>
   </url>
 </urlset>
